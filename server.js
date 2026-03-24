@@ -3,7 +3,6 @@ const dotenv = require('dotenv').config();
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-// Connect to MongoDB Atlas
 connectDB();
 
 const app = express();
