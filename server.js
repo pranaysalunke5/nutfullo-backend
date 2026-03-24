@@ -9,12 +9,12 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors()); // Allows your React frontend to talk to this backend
-// app.use(cors({
-//   origin: 'http://localhost:5173', // Allow your Vite dev server
-//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//   credentials: true
-// }));
+// app.use(cors()); // Allows your React frontend to talk to this backend
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow your Vite dev server
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json()); // Parses incoming JSON data
 
 // Routes
