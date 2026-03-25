@@ -9,7 +9,7 @@ export const onboardGym = async (req, res) => {
         const { onboardedBy } = req.body;
 
         // Backend validation for the specific sales number
-        const validSalesNumbers = ["9049546490", "9999999999", "9049546490"];
+        const validSalesNumbers = ["9049546490", "8767334312", "9049546490"];
 
         if (!validSalesNumbers.includes(onboardedBy)) {
             return res.status(400).json({
