@@ -1,26 +1,30 @@
-const express = require('express');
-const dotenv = require('dotenv').config();
-const cors = require('cors');
-const connectDB = require('./config/db');
+import app from './src/app.js';
+import connectDB from './src/config/db.js';
+import dotenv from 'dotenv';
+import colors from 'colors';
 
+// 1. Load Environment Variables (.env file)
+dotenv.config();
+
+// 2. Connect to MongoDB
 connectDB();
-
-const app = express();
-
-// Middleware
-// app.use(cors()); // Allows your React frontend to talk to this backend
-app.use(cors({
-  origin: 'http://localhost:5173', // Allow your Vite dev server
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
-app.use(express.json()); // Parses incoming JSON data
-
-// Routes
-app.use('/api/enquiries', require('./routes/enquiryRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running in 2026 mode on port ${PORT}`);
+// 3. Start Server
+const server = app.listen(PORT, () => {
+    console.log(
+        colors.yellow.bold(`
+    🚀 Nutfullo Backend is Running!
+    📡 URL:  http://localhost:${PORT}
+    🛠️  Mode: ${process.env.NODE_ENV || 'development'}
+        `)
+    );
+});
+
+// Handle unhandled promise rejections (Optional but recommended)
+process.on('unhandledRejection', (err) => {
+    console.log(colors.red(`Error: ${err.message}`));
+    // Close server & exit process
+    server.close(() => process.exit(1));
 });

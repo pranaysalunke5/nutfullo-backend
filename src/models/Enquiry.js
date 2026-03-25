@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const enquirySchema = new mongoose.Schema({
   name: { 
@@ -12,6 +12,7 @@ const enquirySchema = new mongoose.Schema({
   businessType: { 
     type: String, 
     required: true,
+    // Restricts the input to only these specific options
     enum: ['Gym / Fitness Center', 'Retail / Grocery Shop', 'Wholesale / Distribution', 'Other']
   },
   message: { 
@@ -19,7 +20,10 @@ const enquirySchema = new mongoose.Schema({
     required: [true, 'Please add a message'] 
   }
 }, {
-  timestamps: true // This automatically adds 'createdAt' and 'updatedAt' fields
+  // Automatically manages 'createdAt' and 'updatedAt' for you
+  timestamps: true 
 });
 
-module.exports = mongoose.model('Enquiry', enquirySchema);
+// "export default" is the modern way to export the model
+const Enquiry = mongoose.model('Enquiry', enquirySchema);
+export default Enquiry;
