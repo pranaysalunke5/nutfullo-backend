@@ -9,6 +9,7 @@ import onboardRoutes from './routes/onboardRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use('/api/onboard', onboardRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api', authRoutes);
+app.use('/api/cart/', cartRoutes);
 
 // app.post('/api/auth/verify-otp', verifyOtp);
 // 3. Error Handling (Must be last)
