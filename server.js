@@ -15,12 +15,22 @@ connectDB();
 const PORT = process.env.PORT || 5000;
 
 // 3. Start Server
+// const server = app.listen(PORT, () => {
+//     console.log(
+//         colors.yellow.bold(`
+//     🚀 Nutfullo Backend is Running!
+//     📡 URL:  http://localhost:${PORT}
+//     🛠️  Mode: ${process.env.NODE_ENV || 'development'}
+//         `)
+//     );
+// });
+
 const server = app.listen(PORT, () => {
     console.log(
         colors.yellow.bold(`
     🚀 Nutfullo Backend is Running!
-    📡 URL:  http://localhost:${PORT}
-    🛠️  Mode: ${process.env.NODE_ENV || 'development'}
+    📡 URL:  https://api.nutfullo.com
+    🛠️  Mode: ${process.env.NODE_ENV || 'production'}
         `)
     );
 });
