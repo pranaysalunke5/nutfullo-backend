@@ -8,6 +8,7 @@ import enquiryRoutes from './routes/enquiryRoutes.js';
 import onboardRoutes from './routes/onboardRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -47,7 +48,9 @@ app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/onboard', onboardRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api', authRoutes);
 
+// app.post('/api/auth/verify-otp', verifyOtp);
 // 3. Error Handling (Must be last)
 app.use(notFound);
 app.use(errorHandler);
