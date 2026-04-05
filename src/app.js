@@ -40,7 +40,12 @@ const app = express();
 
 // 1. Production CORS Configuration
 const corsOptions = {
-    origin: ['https://nutfullo.com', 'http://localhost:5173'], // Allow Amplify and local testing
+   origin: [
+        'http://localhost:5173',   // 👈 Vite default port
+        'http://localhost:3000',   // 👈 CRA default port
+        'https://nutfullo.com',    // 👈 Your live frontend
+        'https://www.nutfullo.com'
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 };
