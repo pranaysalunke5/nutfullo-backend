@@ -40,7 +40,7 @@ const app = express();
 
 // 1. Production CORS Configuration
 const corsOptions = {
-    origin: ['https://nutfullo.com', 'http://localhost:3000'], // Allow Amplify and local testing
+    origin: ['https://nutfullo.com', 'http://localhost:5173'], // Allow Amplify and local testing
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 };
