@@ -1,6 +1,9 @@
 import app from './src/app.js';
 import connectDB from './src/config/db.js';
+import './src/config/env.js';
+
 import dotenv from 'dotenv';
+dotenv.config();
 import colors from 'colors';
 
 // 1. Load Environment Variables (.env file)

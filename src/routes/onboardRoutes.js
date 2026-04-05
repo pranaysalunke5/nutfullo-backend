@@ -1,8 +1,15 @@
 import express from 'express';
 import { onboardGym } from '../controllers/onboardController.js';
+import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
-router.post('/', onboardGym); // No 'upload.single' needed here now
+// ✅ FINAL ROUTE
+// router.route('/').post(upload.single('document'), onboardGym);
+
+
+router.post('/', upload.single('document'), onboardGym);
+
+
 
 export default router;
