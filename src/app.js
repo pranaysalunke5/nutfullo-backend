@@ -26,7 +26,7 @@
 //     origin: function (origin, callback) {
 //         // Allow requests with no origin (like mobile apps or curl)
 //         if (!origin) return callback(null, true);
-        
+
 //         if (whitelist.indexOf(origin) !== -1) {
 //             callback(null, true);
 //         } else {
@@ -64,7 +64,7 @@
 
 
 import express from 'express';
-import cors from 'cors'; 
+import cors from 'cors';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { requestLogger } from './middleware/logger.js';
 
@@ -86,13 +86,14 @@ const whitelist = [
     'http://localhost:5173',          // Local Vite (Website)
     'http://localhost:3000',          // Local Next.js (Dashboard)
     'http://127.0.0.1:5173',
+    'https://api.nutfullo.com',
 ];
 
 const corsOptions = {
     origin: function (origin, callback) {
         // Allow requests with no origin (Mobile Apps, Postman, or Server-to-Server)
         if (!origin) return callback(null, true);
-        
+
         if (whitelist.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
@@ -102,16 +103,16 @@ const corsOptions = {
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
-    optionsSuccessStatus: 200 
+    optionsSuccessStatus: 200
 };
 
-app.use(cors(corsOptions)); 
+app.use(cors(corsOptions));
 
 // Increase limits for Partner Documents and Product Images
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
-app.use(requestLogger); 
+app.use(requestLogger);
 
 // Health Check Route (Used by Nginx or Uptime Monitors)
 app.get('/api/health', (req, res) => res.status(200).json({ status: 'UP' }));
