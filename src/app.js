@@ -18,16 +18,33 @@ const whitelist = [
     'https://nutfullo.com',      // Your Live Amplify Site
     'https://www.nutfullo.com',
     'http://localhost:5173',     // Your Local Vite Development
-    'http://localhost:3000'      // Your Local React Development
+    'http://localhost:3000' ,     // Your Local React Development
+    'http://127.0.0.1:5173',
 ];
+
+// const corsOptions = {
+//     origin: function (origin, callback) {
+//         // Allow requests with no origin (like mobile apps or Postman)
+//         if (!origin || whitelist.indexOf(origin) !== -1) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Blocked by Nutfullo Security (CORS)'));
+//         }
+//     },
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     credentials: true,
+//     optionsSuccessStatus: 200
+// };
+
 
 const corsOptions = {
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or Postman)
+        console.log("🚀 Incoming Request Origin:", origin); 
+
         if (!origin || whitelist.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            callback(new Error('Blocked by Nutfullo Security (CORS)'));
+            callback(new Error(`Blocked by Nutfullo Security (CORS): ${origin}`));
         }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -35,7 +52,7 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 
-// Apply Security Middlewares
+
 app.use(cors(corsOptions)); 
 
 // Limit JSON and URL-Encoded payloads to 2MB
