@@ -2,16 +2,6 @@ import mongoose from "mongoose";
 
 const onboardSchema = new mongoose.Schema(
     {
-        // role: {
-        //     type: String,
-        //     required: true,
-        //     enum: [
-        //         "Gym Partner",
-        //         "Retail Partner",
-        //         "Wholesaler", // ✅ FIXED
-        //         "Distributor",
-        //     ],
-        // },
         role: {
             type: String,
             required: true,

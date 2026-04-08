@@ -2,20 +2,15 @@ import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js'; // Ensure you have a User model
 import colors from 'colors';
 
-// 1. Protect Routes: Verifies the JWT token in the header
 export const protect = async (req, res, next) => {
     let token;
 
-    // Check for token in the Authorization header (Bearer <token>)
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
-            // Get token from header
             token = req.headers.authorization.split(' ')[1];
 
-            // Verify token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Get user from the token (excluding the password)
             req.user = await User.findById(decoded.id).select('-password');
 
             next();
@@ -30,8 +25,6 @@ export const protect = async (req, res, next) => {
     }
 };
 
-// 2. Authorize Roles: Checks if the user's role is allowed
-// Usage: authorize('admin', 'staff')
 export const authorize = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {

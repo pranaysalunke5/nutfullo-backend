@@ -1,6 +1,5 @@
 import sendEmail from '../utils/sendEmail.js';
 
-// In-memory store for OTPs (for demo; use DB for production)
 const otpStore = {};
 
 export const sendOtp = async (req, res) => {
@@ -8,13 +7,10 @@ export const sendOtp = async (req, res) => {
         const { input } = req.body;
         if (!input) return res.status(400).json({ success: false, message: "Input required" });
 
-        // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000);
 
-        // Store OTP with expiry (5 min)
         otpStore[input] = { otp, expires: Date.now() + 5 * 60 * 1000 };
 
-        // Send OTP only if input is an email
         if (input.includes('@')) {
             await sendEmail({
                 email: input,
