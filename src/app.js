@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { requestLogger } from './middleware/logger.js';
+import cookieParser from 'cookie-parser';
+
 
 // Route Imports
 import enquiryRoutes from './routes/enquiryRoutes.js';
@@ -12,6 +14,8 @@ import authRoutes from './routes/authRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 
 const app = express();
+app.use(cookieParser());
+
 
 const whitelist = [
     'https://nutfullo.com',           // Main Site

@@ -1,7 +1,6 @@
 import Cart from '../models/cartModel.js';
 import Product from '../models/productModel.js';
 
-// Add/update product in cart
 export const updateCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
