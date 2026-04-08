@@ -41,8 +41,11 @@
 
 
 import Enquiry from '../models/Enquiry.js';
-import sendEmail from '../utils/sendEmail.js';
 import colors from 'colors';
+import {
+  sendAdminEnquiryEmail,
+  sendUserEnquiryEmail,
+} from '../utils/sendEnquiryEmail.js';
 
 export const createEnquiry = async (req, res) => {
   try {
@@ -74,63 +77,31 @@ export const createEnquiry = async (req, res) => {
       message,
     });
 
-    // =========================
-    // 📩 1. ADMIN EMAIL (YOU)
-    // =========================
-    await sendEmail({
-      email: "info@nutfullo.com",
-      subject: "🚀 New Business Enquiry - Nutfullo",
-      html: `
-        <h2>New Enquiry Received</h2>
-        <p><strong>Name:</strong> ${fullName}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Email:</strong> ${email || "N/A"}</p>
-        <p><strong>City:</strong> ${city || "N/A"}</p>
-        <p><strong>Business Type:</strong> ${finalBusinessType}</p>
-        <p><strong>Message:</strong> ${message || "N/A"}</p>
-      `,
-    });
-
-    // =========================
-    // 📩 2. USER EMAIL (THANK YOU)
-    // =========================
-    if (email) {
-      await sendEmail({
-        email: email,
-        subject: "Thank You for Contacting Nutfullo 🙌",
-        html: `
-          <div style="font-family:sans-serif;max-width:500px;margin:auto;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
-            
-            <div style="background:#10b981;padding:20px;text-align:center">
-              <h2 style="color:white;margin:0;">Nutfullo</h2>
-            </div>
-
-            <div style="padding:30px;text-align:center">
-              <h3 style="color:#1e293b;">Thank You, ${fullName}! 🙌</h3>
-
-              <p style="color:#475569;font-size:14px;">
-                Thank you for connecting with us. Our sales team will contact you as soon as possible.
-              </p>
-
-              <p style="margin-top:20px;font-size:13px;color:#64748b;">
-                📞 Phone: ${phone}
-              </p>
-
-              <p style="margin-top:10px;font-size:13px;color:#64748b;">
-                We’re excited to help you grow with Nutfullo 🚀
-              </p>
-
-              <div style="margin-top:25px;">
-                <a href="https://nutfullo.com" 
-                   style="background:#10b981;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;">
-                   Visit Website
-                </a>
-              </div>
-            </div>
-
-          </div>
-        `,
+    // ✅ ADMIN EMAIL (safe)
+    try {
+      await sendAdminEnquiryEmail({
+        fullName,
+        phone,
+        email,
+        city,
+        businessType: finalBusinessType,
+        message,
       });
+    } catch (err) {
+      console.error("Admin Email Failed:", err.message);
+    }
+
+    // ✅ USER EMAIL (safe)
+    if (email) {
+      try {
+        await sendUserEnquiryEmail({
+          fullName,
+          phone,
+          email,
+        });
+      } catch (err) {
+        console.error("User Email Failed:", err.message);
+      }
     }
 
     return res.status(201).json({
