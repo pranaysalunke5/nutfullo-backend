@@ -1,74 +1,52 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT) || 587,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT) || 587,
+  secure: false, // true for 465, false for 587
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
-
-// 📩 ADMIN EMAIL (YOU)
-export const sendAdminEnquiryEmail = async (data) => {
-    const mailOptions = {
-        from: '"Nutfullo Enquiry" <info@nutfullo.com>',
-        to: "info@nutfullo.com",
-        subject: "🚀 New Business Enquiry - Nutfullo",
-        html: `
-      <h2>New Enquiry Received</h2>
-      <p><strong>Name:</strong> ${data.fullName}</p>
-      <p><strong>Phone:</strong> ${data.phone}</p>
-      <p><strong>Email:</strong> ${data.email || "N/A"}</p>
-      <p><strong>City:</strong> ${data.city || "N/A"}</p>
-      <p><strong>Business Type:</strong> ${data.businessType}</p>
-      <p><strong>Message:</strong> ${data.message || "N/A"}</p>
-    `,
-    };
-
-    await transporter.sendMail(mailOptions);
-};
-
-// 📩 USER THANK YOU EMAIL
-export const sendUserEnquiryEmail = async (data) => {
-    const mailOptions = {
-        from: '"Nutfullo" <info@nutfullo.com>',
-        to: data.email,
-        subject: "Thank You for Contacting Nutfullo 🙌",
-        html: `
-      <div style="font-family:sans-serif;max-width:500px;margin:auto;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
+const sendEnquiryEmail = async (options) => {
+  const mailOptions = {
+    from: '"Nutfullo Official" <info@nutfullo.com>',
+    to: options.email,
+    subject: 'We Received Your Nutfullo Enquiry! 🚀',
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 24px; overflow: hidden; background-color: #ffffff;">
+        <div style="background-color: #065f46; padding: 40px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 32px; font-weight: 900;">Nutfullo.</h1>
+          <p style="color: #a7f3d0; margin: 10px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Partner Program</p>
+        </div>
         
-        <div style="background:#10b981;padding:20px;text-align:center">
-          <h2 style="color:white;margin:0;">Nutfullo</h2>
-        </div>
-
-        <div style="padding:30px;text-align:center">
-          <h3 style="color:#1e293b;">Thank You, ${data.fullName}! 🙌</h3>
-
-          <p style="color:#475569;font-size:14px;">
-            Thank you for connecting with us. Our sales team will contact you as soon as possible.
+        <div style="padding: 40px; text-align: center;">
+          <h2 style="color: #1e293b; font-size: 22px;">Hello ${options.fullName},</h2>
+          <p style="color: #475569; font-size: 16px; line-height: 1.6;">
+            Thank you for your interest in partnering with us. We’ve received your enquiry and our team will review it shortly.
           </p>
 
-          <p style="margin-top:20px;font-size:13px;color:#64748b;">
-            📞 Phone: ${data.phone}
-          </p>
-
-          <p style="margin-top:10px;font-size:13px;color:#64748b;">
-            We’re excited to help you grow with Nutfullo 🚀
-          </p>
-
-          <div style="margin-top:25px;">
-            <a href="https://nutfullo.com" 
-               style="background:#10b981;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;">
-               Visit Website
-            </a>
+          <div style="margin: 30px 0; padding: 25px; background-color: #f0fdf4; border-radius: 16px; border: 1px solid #dcfce7; text-align: left;">
+            <h3 style="color: #166534; font-size: 13px; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #dcfce7; padding-bottom: 10px;">Enquiry Details</h3>
+            <p style="margin: 8px 0; color: #334155; font-size: 15px;"><strong>Interest:</strong> ${options.businessType}</p>
+            <p style="margin: 8px 0; color: #334155; font-size: 15px;"><strong>City:</strong> ${options.city || 'Not Provided'}</p>
+            <p style="margin: 8px 0; color: #334155; font-size: 15px;"><strong>Phone:</strong> ${options.phone}</p>
           </div>
+
+          <p style="color: #64748b; font-size: 14px;">
+            One of our representatives will contact you via phone or WhatsApp within 24 hours.
+          </p>
         </div>
 
+        <div style="background-color: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9;">
+          Nutfullo Official • Shivtirthnagar, Kothrud, Pune – 411038
+        </div>
       </div>
     `,
-    };
+  };
 
-    await transporter.sendMail(mailOptions);
+  await transporter.sendMail(mailOptions);
 };
+
+export default sendEnquiryEmail;

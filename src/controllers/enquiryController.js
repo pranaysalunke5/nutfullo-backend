@@ -1,13 +1,12 @@
 import Enquiry from '../models/Enquiry.js';
-import colors from 'colors';
-import {
-  sendAdminEnquiryEmail,
-  sendUserEnquiryEmail,
-} from '../utils/sendEnquiryEmail.js';
+import sendEnquiryEmail from '../utils/sendEnquiryEmail.js'; // Import the new one
 
 export const createEnquiry = async (req, res) => {
   try {
-    const {
+    const { fullName, phone, email, city, businessType, otherBusinessType, message } = req.body;
+
+    // 1. Create in DB
+    const enquiry = await Enquiry.create({
       fullName,
       phone,
       email,
@@ -15,66 +14,34 @@ export const createEnquiry = async (req, res) => {
       businessType,
       otherBusinessType,
       message,
-    } = req.body;
-
-    if (!fullName || !phone) {
-      return res.status(400).json({
-        success: false,
-        message: "Name and phone are required",
-      });
-    }
-
-    const finalBusinessType =
-      businessType === "Other" ? otherBusinessType : businessType;
-
-    await Enquiry.create({
-      fullName,
-      phone,
-      email,
-      city,
-      businessType,
-      otherBusinessType: businessType === "Other" ? otherBusinessType : null,
-      message,
     });
 
-    // ✅ ADMIN EMAIL (safe)
-    try {
-      await sendAdminEnquiryEmail({
-        fullName,
-        phone,
-        email,
-        city,
-        businessType: finalBusinessType,
-        message,
-      });
-    } catch (err) {
-      console.error("Admin Email Failed:", err.message);
-    }
-
-    // ✅ USER EMAIL (safe)
+    // 2. Send the confirmation email
     if (email) {
       try {
-        await sendUserEnquiryEmail({
+        await sendEnquiryEmail({
+          email,
           fullName,
           phone,
-          email,
+          city,
+          businessType: businessType === "Other" ? otherBusinessType : businessType
         });
       } catch (err) {
-        console.error("User Email Failed:", err.message);
+        console.error("Confirmation email failed:", err.message);
+        // Silently fail so the user still sees their enquiry went through
       }
     }
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
-      message: "Enquiry submitted successfully",
+      message: 'Enquiry Sent Successfully 🚀',
+      data: enquiry,
     });
 
   } catch (error) {
-    console.error(colors.red(`[Enquiry Error]: ${error.message}`));
-
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message || 'Server Error',
     });
   }
 };
