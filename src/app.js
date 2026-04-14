@@ -27,6 +27,7 @@ const whitelist = [
     'http://localhost:3000',          // Local Next.js (Dashboard)
     'http://127.0.0.1:5173',
     'https://api.nutfullo.com',
+    'https://main.dgmsl5sfhz7tb.amplifyapp.com',
 ];
 
 const corsOptions = {
