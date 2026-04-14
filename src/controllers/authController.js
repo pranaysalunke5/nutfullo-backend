@@ -133,8 +133,8 @@
 //     });
 // };
 
-import User from '../models/User.js'; // Adjust path based on your structure
 import sendEmail from '../utils/sendEmail.js'; 
+import User from '../models/userModel.js';
 import crypto from 'crypto';
 
 export const sendOtp = async (req, res) => {
