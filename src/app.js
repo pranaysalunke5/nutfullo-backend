@@ -12,6 +12,8 @@ import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import userRoutes from "./routes/userRoutes.js";
+
 
 const app = express();
 app.use(cookieParser());
@@ -52,7 +54,7 @@ app.use(requestLogger);
 
 app.get('/api/health', (req, res) => res.status(200).json({ status: 'UP' }));
 
-// 2. API Routes
+app.use("/api/users", userRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/onboard', onboardRoutes); // Matches /api/onboard/add
 app.use('/api/products', productRoutes);
