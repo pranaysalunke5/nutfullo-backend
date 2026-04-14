@@ -36,22 +36,23 @@ export const createProduct = async (req, res) => {
   try {
     const { name, description, price, category, stock } = req.body;
 
-    let image = {};
-
-    if (req.file) {
-      image = {
-        url: req.file.path,
-        public_id: req.file.filename,
-      };
+    // 1. Handle Multiple Images
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = req.files.map((file) => ({
+        url: file.path,
+        public_id: file.filename,
+      }));
     }
 
+    // 2. Create Product with the 'images' array
     const product = await Product.create({
       name,
       description,
       price,
       category,
       stock,
-      image, // single image
+      images, // Matches the schema key
     });
 
     res.status(201).json({
@@ -59,13 +60,13 @@ export const createProduct = async (req, res) => {
       data: product,
     });
   } catch (error) {
+    // This will now catch validation errors or missing fields
     res.status(400).json({
       success: false,
       error: error.message,
     });
   }
 };
-
 
 export const updateProduct = async (req, res) => {
   try {
