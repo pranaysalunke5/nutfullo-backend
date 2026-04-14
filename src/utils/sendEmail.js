@@ -39,29 +39,37 @@
 // export default sendEmail;
 
 // src/config/sendEmail.js
+
+
+
+
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT) || 2525,
-  secure: false, 
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
 const sendEmail = async (options) => {
-  // DEBUG: Check if email is actually defined
+  // Use a fresh transporter instance inside the function for reliability on EC2
+  const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: parseInt(process.env.EMAIL_PORT) || 2525,
+    secure: false, 
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
   if (!options.email) {
     throw new Error("sendEmail failed: No recipient email address provided.");
   }
 
+  // Choose the label and email based on the 'fromType' passed in
+  const senderEmail = options.fromEmail || process.env.EMAIL_INFO || "info@nutfullo.com";
+  const senderLabel = options.fromLabel || "Nutfullo Official";
+
   const mailOptions = {
-    from: '"Nutfullo Official" <info@nutfullo.com>',
+    from: `"${senderLabel}" <${senderEmail}>`,
     to: options.email,
     subject: options.subject,
-    html: `
+    html: options.html || `
       <div style="font-family: sans-serif; max-width: 500px; margin: auto; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden;">
         <div style="background-color: #10b981; padding: 30px; text-align: center;">
           <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 900;">Nutfullo.</h1>

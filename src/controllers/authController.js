@@ -133,11 +133,11 @@
 //     });
 // };
 
+
+
 import sendEmail from '../utils/sendEmail.js'; 
 import User from '../models/userModel.js';
 import crypto from 'crypto';
-
-
 
 export const sendOtp = async (req, res) => {
     try {
@@ -147,7 +147,6 @@ export const sendOtp = async (req, res) => {
             return res.status(400).json({ success: false, message: "Email or Mobile is required" });
         }
 
-        // 1. Find user by email or mobile
         const user = await User.findOne({
             $or: [{ email: input }, { mobile: input }]
         });
@@ -159,7 +158,6 @@ export const sendOtp = async (req, res) => {
             });
         }
 
-        // 2. Check if user has a registered email for OTP delivery
         if (!user.email) {
             return res.status(400).json({ 
                 success: false, 
@@ -167,21 +165,21 @@ export const sendOtp = async (req, res) => {
             });
         }
 
-        // 3. Generate and Save OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         user.otp = crypto.createHash('sha256').update(otp).digest('hex');
-        user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 Minutes
+        user.otpExpire = Date.now() + 10 * 60 * 1000;
         await user.save();
 
-        // 4. Send Email and handle Brevo/SMTP errors
         try {
+            // Using info@nutfullo.com for OTPs
             await sendEmail({
+                fromEmail: process.env.EMAIL_INFO, // passed from .env
+                fromLabel: "Nutfullo Official",
                 email: user.email,
                 subject: "Nutfullo Verification Code",
                 otp: otp 
             });
 
-            // Mask email for the frontend toast (e.g., pr***@gmail.com)
             const maskedEmail = user.email.replace(/(.{2})(.*)(?=@)/, "$1***");
 
             return res.status(200).json({ 
@@ -190,7 +188,6 @@ export const sendOtp = async (req, res) => {
             });
 
         } catch (mailError) {
-            // If email fails, clear the OTP so the user can try again immediately
             user.otp = undefined;
             user.otpExpire = undefined;
             await user.save();
@@ -199,7 +196,7 @@ export const sendOtp = async (req, res) => {
             
             return res.status(500).json({ 
                 success: false, 
-                message: "Failed to deliver email. Please try again later." 
+                message: "Failed to deliver email. Please check server logs." 
             });
         }
 
@@ -214,7 +211,6 @@ export const verifyOtp = async (req, res) => {
         const { input, otp } = req.body;
         const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
-        // Find user by either field and check OTP
         const isEmail = input.includes('@');
         const user = await User.findOne({
             ...(isEmail ? { email: input } : { mobile: input }),
@@ -226,12 +222,13 @@ export const verifyOtp = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
         }
 
-        // Clear OTP fields after successful verification
         user.otp = undefined;
         user.otpExpire = undefined;
         await user.save();
 
-        // Send back user data including the role for your sidebar logic
+        // Generate your JWT token here if needed
+        const token = "your_generated_jwt_token_here";
+
         res.status(200).json({
             success: true,
             user: {
@@ -239,10 +236,10 @@ export const verifyOtp = async (req, res) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                role: user.role, // This matches your Sidebar roles
+                role: user.role,
                 profileImage: user.profileImage
             },
-            token: "your_generated_jwt_token_here" 
+            token
         });
 
     } catch (error) {
