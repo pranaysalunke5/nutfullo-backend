@@ -18,7 +18,7 @@ router.route('/:id')
     .delete(deleteProduct);
 
 // 2. GET /api/products - To see all products
-router.route('/').get(getProducts);
+router.route('/allProducts').get(getProducts);
 
 
 

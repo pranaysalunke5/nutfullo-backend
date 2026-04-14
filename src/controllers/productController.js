@@ -132,7 +132,23 @@ export const deleteProduct = async (req, res) => {
 };
 // @desc    Get all products
 // @route   GET /api/products
+
+
+
 export const getProducts = async (req, res) => {
-  const products = await Product.find();
-  res.status(200).json({ success: true, data: products });
+  try {
+    // Adding .sort() helps show the newest products at the top
+    const products = await Product.find().sort({ createdAt: -1 });
+
+    res.status(200).json({ 
+      success: true, 
+      count: products.length,
+      data: products 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      error: "Server Error: Could not fetch products" 
+    });
+  }
 };
