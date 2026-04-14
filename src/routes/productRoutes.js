@@ -11,7 +11,7 @@ const router = express.Router();
 import upload from '../middleware/upload.js';
 
 router.route('/add')
-    .post(upload.array("images", 5), createProduct);
+    .post(upload.array("images"), createProduct);
 
 router.route('/:id')
     .put(upload.array("images", 5), updateProduct)
