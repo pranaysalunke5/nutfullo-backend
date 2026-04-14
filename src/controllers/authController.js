@@ -137,55 +137,45 @@ import sendEmail from '../utils/sendEmail.js';
 import User from '../models/userModel.js';
 import crypto from 'crypto';
 
+// Inside your sendOtp controller
 export const sendOtp = async (req, res) => {
     try {
-        const { input } = req.body; // 'input' comes from your frontend state
+        const { input } = req.body;
+        
+        // Find user by email or mobile
+        const user = await User.findOne({
+            $or: [{ email: input }, { mobile: input }]
+        });
 
-        if (!input) {
-            return res.status(400).json({ success: false, message: "Please provide email or mobile number" });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // 1. Determine if input is email or mobile and find user
-        const isEmail = input.includes('@');
-        const query = isEmail ? { email: input } : { mobile: input };
-
-        const user = await User.findOne(query);
-
-        // 2. If user doesn't exist, send the 404 for your "User not available" toast
-        if (!user) {
-            return res.status(404).json({ 
+        // CRITICAL CHECK: Does the user found in DB actually have an email?
+        if (!user.email) {
+            return res.status(400).json({ 
                 success: false, 
-                message: "User not available. Please contact administrator." 
+                message: "User found, but no email is registered for this account." 
             });
         }
 
-        // 3. Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
-
-        // 4. Save hashed OTP to user (valid for 5 mins)
-        user.otp = hashedOtp;
-        user.otpExpire = Date.now() + 5 * 60 * 1000;
+        user.otp = crypto.createHash('sha256').update(otp).digest('hex');
+        user.otpExpire = Date.now() + 10 * 60 * 1000;
         await user.save();
 
-        // 5. Send OTP to the user's REGISTERED email (even if they entered mobile)
+        // Pass 'otp' and 'email' correctly
         await sendEmail({
-            email: user.email,
-            subject: "Your Nutfullo Verification Code",
-            message: `Your OTP is ${otp}. It expires in 5 minutes.`,
+            email: user.email, 
+            subject: "Nutfullo Login OTP",
+            otp: otp // Match the key in sendEmail.js
         });
 
-        // 6. Return success with masked email for the "Check Mail" toast
-        const maskedEmail = user.email.replace(/(.{2})(.*)(?=@)/, "$1***");
-        
-        res.status(200).json({
-            success: true,
-            message: `OTP sent! Please check your mail: ${maskedEmail}`
-        });
+        res.status(200).json({ success: true, message: "OTP sent to your email" });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        console.error("Internal Error:", error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
