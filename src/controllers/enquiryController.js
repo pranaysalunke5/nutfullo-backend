@@ -118,6 +118,7 @@ export const createEnquiry = async (req, res) => {
 
     // ✅ 3. SEND EMAIL TO ADMIN (VERY IMPORTANT)
     try {
+      console.log("EMAIL_HOST:", process.env.EMAIL_HOST);
       await sendEnquiryEmail({
         email: process.env.EMAIL_INFO, // your company email
         subject: "🚀 New Enquiry Received",
