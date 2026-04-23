@@ -28,6 +28,7 @@ const whitelist = [
     'http://127.0.0.1:5173',
     'https://api.nutfullo.com',
     'https://main.dgmsl5sfhz7tb.amplifyapp.com',
+    'https://dashboard.nutfullo.com'
 ];
 
 const corsOptions = {
