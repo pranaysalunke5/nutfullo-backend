@@ -1,4 +1,4 @@
-import sendEmail from '../utils/sendEmail.js'; 
+import sendEmail from '../utils/sendEmail.js';
 import User from '../models/userModel.js';
 import crypto from 'crypto';
 
@@ -15,16 +15,16 @@ export const sendOtp = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "User not available. Please contact administrator." 
+            return res.status(404).json({
+                success: false,
+                message: "User not available. Please contact administrator."
             });
         }
 
         if (!user.email) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "No email address found for this account." 
+            return res.status(400).json({
+                success: false,
+                message: "No email address found for this account."
             });
         }
 
@@ -40,14 +40,14 @@ export const sendOtp = async (req, res) => {
                 fromLabel: "Nutfullo Official",
                 email: user.email,
                 subject: "Nutfullo Verification Code",
-                otp: otp 
+                otp: otp
             });
 
             const maskedEmail = user.email.replace(/(.{2})(.*)(?=@)/, "$1***");
 
-            return res.status(200).json({ 
-                success: true, 
-                message: `OTP sent! Please check your mail: ${maskedEmail}` 
+            return res.status(200).json({
+                success: true,
+                message: `OTP sent! Please check your mail: ${maskedEmail}`
             });
 
         } catch (mailError) {
@@ -56,10 +56,10 @@ export const sendOtp = async (req, res) => {
             await user.save();
 
             console.error("Brevo/SMTP Error:", mailError.message);
-            
-            return res.status(500).json({ 
-                success: false, 
-                message: "Failed to deliver email. Please check server logs." 
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to deliver email. Please check server logs."
             });
         }
 
@@ -69,46 +69,107 @@ export const sendOtp = async (req, res) => {
     }
 };
 
+// export const verifyOtp = async (req, res) => {
+//     try {
+//         const { input, otp } = req.body;
+//         const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+
+//         const isEmail = input.includes('@');
+//         const user = await User.findOne({
+//             ...(isEmail ? { email: input } : { mobile: input }),
+//             otp: hashedOtp,
+//             otpExpire: { $gt: Date.now() }
+//         });
+
+//         if (!user) {
+//             return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+//         }
+
+//         user.otp = undefined;
+//         user.otpExpire = undefined;
+//         await user.save();
+
+//         // Generate your JWT token here if needed
+//         const token = "your_generated_jwt_token_here";
+
+//         res.status(200).json({
+//             success: true,
+//             user: {
+//                 id: user._id,
+//                 firstName: user.firstName,
+//                 lastName: user.lastName,
+//                 email: user.email,
+//                 role: user.role,
+//                 profileImage: user.profileImage
+//             },
+//             token
+//         });
+
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: "Verification failed" });
+//     }
+// };
+
+
+
+
 export const verifyOtp = async (req, res) => {
     try {
         const { input, otp } = req.body;
-        const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
-        const isEmail = input.includes('@');
+        const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+
+        const isEmail = input.includes("@");
+
         const user = await User.findOne({
             ...(isEmail ? { email: input } : { mobile: input }),
             otp: hashedOtp,
-            otpExpire: { $gt: Date.now() }
+            otpExpire: { $gt: Date.now() },
         });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+            return res.status(400).json({
+                success: false,
+                message: "Invalid or expired OTP",
+            });
         }
 
+        // cleanup
         user.otp = undefined;
         user.otpExpire = undefined;
+        user.isVerified = true;
         await user.save();
 
-        // Generate your JWT token here if needed
-        const token = "your_generated_jwt_token_here";
+        // ✅ REAL TOKEN
+        const token = user.getSignedJwtToken();
+
+        // ✅ SET COOKIE (THIS WAS MISSING)
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            maxAge: 15 * 60 * 1000,
+        });
 
         res.status(200).json({
             success: true,
             user: {
                 id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
+                name: user.name,
                 email: user.email,
                 role: user.role,
-                profileImage: user.profileImage
             },
-            token
         });
-
     } catch (error) {
-        res.status(500).json({ success: false, message: "Verification failed" });
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Verification failed",
+        });
     }
 };
+
+
 
 export const getMe = async (req, res) => {
     res.json({
