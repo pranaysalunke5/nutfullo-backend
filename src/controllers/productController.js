@@ -1,4 +1,6 @@
 import Product from "../models/productModel.js";
+import cloudinary from "../config/cloudinary.js";
+
 
 
 export const createProduct = async (req, res) => {
@@ -69,40 +71,43 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
-// @desc    Delete a product
-// @route   DELETE /api/products/:id
+
+
+
 
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
     if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
+      return res.status(404).json({ error: "Product not found" });
     }
 
-    // 👇 Delete images from Cloudinary
-    for (let img of product.images) {
-      if (img.public_id) {
-        await cloudinary.uploader.destroy(img.public_id);
+    // 🔥 DELETE IMAGES FROM CLOUDINARY
+    if (product.images && product.images.length > 0) {
+      for (const img of product.images) {
+        if (img.public_id) {
+          try {
+            await cloudinary.uploader.destroy(img.public_id);
+          } catch (err) {
+            console.log("Cloudinary delete failed:", err.message);
+          }
+        }
       }
     }
 
+    // 🔥 DELETE PRODUCT FROM DB
     await product.deleteOne();
 
-    res.status(200).json({
+    res.json({
       success: true,
-      message: "Product removed",
+      message: "Product and images deleted successfully",
     });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
 };
-// @desc    Get all products
-// @route   GET /api/products
-
-
 
 export const getProducts = async (req, res) => {
   try {
@@ -119,5 +124,42 @@ export const getProducts = async (req, res) => {
       success: false, 
       error: "Server Error: Could not fetch products" 
     });
+  }
+};
+
+// GET /api/products/check-sku?sku=ABC-123
+export const generateSku = async (req, res) => {
+  try {
+    const { name, category } = req.query;
+
+    if (!name || !category) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    // 🔹 BASE SKU
+    const base =
+      category.substring(0, 3).toUpperCase() +
+      "-" +
+      name.replace(/\s+/g, "").substring(0, 5).toUpperCase();
+
+    // 🔹 FIND ALL MATCHING SKU
+    const existing = await Product.find({
+      sku: { $regex: `^${base}` },
+    }).select("sku");
+
+    // 🔹 COUNT TOTAL PRODUCTS
+    const total = existing.length;
+
+    // 🔥 GROUP LOGIC (100 per block)
+    const groupNumber = Math.floor(total / 100) + 1;
+
+    // 🔹 FORMAT 001, 002...
+    const formatted = String(groupNumber).padStart(3, "0");
+
+    const finalSku = `${base}-${formatted}`;
+
+    res.json({ sku: finalSku });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
 };
