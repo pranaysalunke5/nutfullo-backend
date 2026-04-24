@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import enquiryRoutes from './routes/enquiryRoutes.js';
 import onboardRoutes from './routes/onboardRoutes.js';
 import productRoutes from './routes/productRoutes.js';
-import orderRoutes from './routes/orderRoutes.js';
+// import orderRoutes from './routes/orderRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import userRoutes from "./routes/userRoutes.js";
@@ -62,7 +62,7 @@ app.use("/api/users", userRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/onboard', onboardRoutes); // Matches /api/onboard/add
 app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
+// app.use('/api/orders', orderRoutes);
 app.use('/api', authRoutes);
 app.use('/api/cart', cartRoutes);
 
