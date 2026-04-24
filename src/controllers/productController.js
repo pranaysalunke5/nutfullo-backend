@@ -1,37 +1,6 @@
 import Product from "../models/productModel.js";
 
 
-// export const createProduct = async (req, res) => {
-//   try {
-//     const { name, description, price, category, stock } = req.body;
-
-//     const images = req.files.map((file) => ({
-//       url: file.path,
-//       public_id: file.filename,
-//     }));
-
-//     const product = await Product.create({
-//       name,
-//       description,
-//       price,
-//       category,
-//       stock,
-//       images,
-//     });
-
-//     res.status(201).json({
-//       success: true,
-//       data: product,
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       success: false,
-//       error: error.message,
-//     });
-//   }
-// };
-
-
 export const createProduct = async (req, res) => {
   try {
     const { name, description, price, category, stock } = req.body;

@@ -32,6 +32,9 @@ const productSchema = new mongoose.Schema(
         public_id: { type: String }, // 👈 add this
       },
     ],
+    mrp: { type: Number, default: 0 },
+    salePrice: { type: Number, default: 0 },
+    basePrice: { type: Number, default: 0 },
     isFeatured: {
       type: Boolean,
       default: false,
