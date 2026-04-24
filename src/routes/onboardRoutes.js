@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.post('/add', upload.single('document'), onboardGym);
 
+router.get('/', getOnboards);
+
 export default router;

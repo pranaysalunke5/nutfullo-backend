@@ -93,3 +93,22 @@ export const onboardGym = async (req, res) => {
         });
     }
 };
+
+
+export const getOnboards = async (req, res) => {
+    try {
+        // Fetch all, sorted by newest first
+        const onboards = await Onboard.find().sort({ createdAt: -1 });
+        
+        res.status(200).json({
+            success: true,
+            data: onboards,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch data",
+            error: error.message,
+        });
+    }
+};
