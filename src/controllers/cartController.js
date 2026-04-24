@@ -76,11 +76,14 @@ export const getCart = async (req, res) => {
     const cart = await Cart.findOne({ user: req.user._id })
       .populate("items.product");
 
+    if (!cart) {
+      return res.json({ success: true, items: [] });
+    }
+
     res.json({
       success: true,
-      items: cart ? cart.items : [],
+      items: cart.items,
     });
-
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch cart" });
   }
