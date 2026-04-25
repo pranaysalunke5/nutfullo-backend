@@ -3,7 +3,9 @@ import {
     createProduct, 
     updateProduct, 
     deleteProduct,
-    getProducts 
+    getProducts,
+    generateSku, 
+    
 } from '../controllers/productController.js';
 
 const router = express.Router();
@@ -21,5 +23,8 @@ router.route('/:id')
 router.route('/allProducts').get(getProducts);
 
 
+router.get("/generate-sku", generateSku);
+
+router.route("/:id").delete(deleteProduct);
 
 export default router;
