@@ -3,6 +3,9 @@ dotenv.config();
 import app from './src/app.js';
 import connectDB from './src/config/db.js';
 import colors from 'colors';
+// import Onboard from "../models/onboard.js";
+import Onboard from "./src/models/onboard.js";
+import User from "./src/models/userModel.js";
 
 connectDB();
 
@@ -28,3 +31,6 @@ process.on('unhandledRejection', (err) => {
     console.log(colors.red(`Unhandled Rejection: ${err.message}`));
     server.close(() => process.exit(1));
 });
+
+
+
