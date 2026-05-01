@@ -1,5 +1,5 @@
 import express from 'express';
-import { onboardGym  ,getOnboards} from '../controllers/onboardController.js';
+import { onboardGym  ,getOnboards, updateOnboard, deleteOnboard} from '../controllers/onboardController.js';
 import upload from '../middleware/upload.js';
 
 const router = express.Router();
@@ -8,6 +8,8 @@ router.post('/add', upload.single('document'), onboardGym);
 
 router.get('/', getOnboards);
 
+router.put('/:id', updateOnboard);         // ✅ NEW
+router.delete('/:id', deleteOnboard);     
 
 
 export default router;

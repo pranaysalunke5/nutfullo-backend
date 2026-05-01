@@ -25,6 +25,5 @@ router.route('/allProducts').get(getProducts);
 
 router.get("/generate-sku", generateSku);
 
-router.route("/:id").delete(deleteProduct);
 
 export default router;
