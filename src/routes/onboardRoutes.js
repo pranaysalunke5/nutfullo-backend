@@ -8,7 +8,11 @@ router.post('/add', upload.single('document'), onboardGym);
 
 router.get('/', getOnboards);
 
-router.put('/:id', updateOnboard);         // ✅ NEW
+// router.put('/:id', updateOnboard);         // ✅ NEW
+
+// routes/onboardRoutes.js
+router.put('/:id', upload.single('document'), updateOnboard);
+
 router.delete('/:id', deleteOnboard);     
 
 

@@ -13,6 +13,7 @@ import productRoutes from './routes/productRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import userRoutes from "./routes/userRoutes.js";
+import vendorRoutes from "./routes/vendorRoutes.js";
 
 
 const app = express();
@@ -65,6 +66,8 @@ app.use('/api/products', productRoutes);
 // app.use('/api/orders', orderRoutes);
 app.use('/api', authRoutes);
 app.use('/api/cart', cartRoutes);
+
+app.use("/api/vendors", vendorRoutes);
 
 // 3. Error Handling
 app.use(notFound);

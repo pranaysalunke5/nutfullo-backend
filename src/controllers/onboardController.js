@@ -54,13 +54,40 @@ export const getOnboards = async (req, res) => {
   }
 };
 
+// export const updateOnboard = async (req, res) => {
+//   try {
+//     const updated = await Onboard.findByIdAndUpdate(
+//       req.params.id,
+//       { $set: req.body },
+//       { new: true, runValidators: true }
+//     );
+//     if (!updated) return res.status(404).json({ message: "Not found" });
+//     res.status(200).json({ success: true, data: updated });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+// controllers/onboardController.js
 export const updateOnboard = async (req, res) => {
   try {
+    let updateData = { ...req.body };
+
+    // If a new file is uploaded, update the document object
+    if (req.file) {
+      updateData.document = {
+        url: req.file.path,
+        public_id: req.file.filename,
+      };
+    }
+
     const updated = await Onboard.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
+
     if (!updated) return res.status(404).json({ message: "Not found" });
     res.status(200).json({ success: true, data: updated });
   } catch (error) {
