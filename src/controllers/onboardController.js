@@ -1,12 +1,60 @@
 import Onboard from "../models/onboard.js";
 import User from "../models/userModel.js";
 
+// export const onboardGym = async (req, res) => {
+//   try {
+//     const mobile = req.body.onboardedBy;
+
+//     // 🔍 find user by mobile
+//     const user = await User.findOne({ mobile });
+
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Sales user not found",
+//       });
+//     }
+
+//     const newEntry = await Onboard.create({
+//       ...req.body,
+
+//       onboardedBy: {
+//         mobile: user.mobile,
+//         name: user.name,       // ✅ SAVE NAME
+//         userId: user._id,      // ✅ SAVE ID
+//       },
+
+//       document: {
+//         url: req.file?.path || null,
+//         public_id: req.file?.filename || null,
+//       },
+//     });
+
+//     res.status(201).json({
+//       success: true,
+//       data: newEntry,
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 export const onboardGym = async (req, res) => {
   try {
-    const mobile = req.body.onboardedBy;
+    const { ownerMobile, onboardedBy: salesMobile } = req.body;
 
-    // 🔍 find user by mobile
-    const user = await User.findOne({ mobile });
+    // 1. 🔍 Check if this partner (Gym/Retailer) is already onboarded
+    const existingOnboard = await Onboard.findOne({ ownerMobile });
+    if (existingOnboard) {
+      return res.status(400).json({
+        success: false,
+        message: "This mobile number is already onboarded.",
+      });
+    }
+
+    // 2. 🔍 find sales user by mobile
+    const user = await User.findOne({ mobile: salesMobile });
 
     if (!user) {
       return res.status(404).json({
@@ -15,15 +63,14 @@ export const onboardGym = async (req, res) => {
       });
     }
 
+    // 3. Create new entry
     const newEntry = await Onboard.create({
       ...req.body,
-
       onboardedBy: {
         mobile: user.mobile,
-        name: user.name,       // ✅ SAVE NAME
-        userId: user._id,      // ✅ SAVE ID
+        name: user.name,
+        userId: user._id,
       },
-
       document: {
         url: req.file?.path || null,
         public_id: req.file?.filename || null,
@@ -36,7 +83,10 @@ export const onboardGym = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
   }
 };
 
