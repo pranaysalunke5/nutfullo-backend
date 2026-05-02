@@ -1,52 +1,3 @@
-// import Enquiry from '../models/Enquiry.js';
-// import sendEnquiryEmail from '../utils/sendEnquiryEmail.js'; // Import the new one
-
-// export const createEnquiry = async (req, res) => {
-//   try {
-//     const { fullName, phone, email, city, businessType, otherBusinessType, message } = req.body;
-
-//     // 1. Create in DB
-//     const enquiry = await Enquiry.create({
-//       fullName,
-//       phone,
-//       email,
-//       city,
-//       businessType,
-//       otherBusinessType,
-//       message,
-//     });
-
-//     // 2. Send the confirmation email
-//     if (email) {
-//       try {
-//         await sendEnquiryEmail({
-//           email,
-//           fullName,
-//           phone,
-//           city,
-//           businessType: businessType === "Other" ? otherBusinessType : businessType
-//         });
-//       } catch (err) {
-//         console.error("Confirmation email failed:", err.message);
-//         // Silently fail so the user still sees their enquiry went through
-//       }
-//     }
-
-//     res.status(201).json({
-//       success: true,
-//       message: 'Enquiry Sent Successfully 🚀',
-//       data: enquiry,
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message || 'Server Error',
-//     });
-//   }
-// };
-
-
 import Enquiry from '../models/Enquiry.js';
 import sendEnquiryEmail from '../utils/sendEnquiryEmail.js';
 
@@ -151,5 +102,30 @@ export const createEnquiry = async (req, res) => {
       success: false,
       message: error.message || 'Server Error',
     });
+  }
+};
+
+
+// controllers/enquiryController.js
+
+// @desc Get all enquiries
+export const getAllEnquiries = async (req, res) => {
+  try {
+    const enquiries = await Enquiry.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: enquiries });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc Update status
+export const updateEnquiryStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const enquiry = await Enquiry.findByIdAndUpdate(id, { status }, { new: true });
+    res.status(200).json({ success: true, data: enquiry });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };

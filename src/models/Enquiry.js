@@ -31,7 +31,11 @@ const enquirySchema = new mongoose.Schema({
     type: String,
     default: null
   },
-
+  status: {
+    type: String,
+    enum: ['Pending', 'Contacted', 'Resolved', 'Spam'],
+    default: 'Pending'
+  },
   message: {
     type: String,
     default: ""
