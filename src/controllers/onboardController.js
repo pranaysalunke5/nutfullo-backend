@@ -1,12 +1,22 @@
 import Onboard from "../models/onboard.js";
 import User from "../models/userModel.js";
 
+
 // export const onboardGym = async (req, res) => {
 //   try {
-//     const mobile = req.body.onboardedBy;
+//     const { ownerMobile, onboardedBy: salesMobile } = req.body;
 
-//     // 🔍 find user by mobile
-//     const user = await User.findOne({ mobile });
+//     // 1. 🔍 Check if this partner (Gym/Retailer) is already onboarded
+//     const existingOnboard = await Onboard.findOne({ ownerMobile });
+//     if (existingOnboard) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "This mobile number is already onboarded.",
+//       });
+//     }
+
+//     // 2. 🔍 find sales user by mobile
+//     const user = await User.findOne({ mobile: salesMobile });
 
 //     if (!user) {
 //       return res.status(404).json({
@@ -15,15 +25,14 @@ import User from "../models/userModel.js";
 //       });
 //     }
 
+//     // 3. Create new entry
 //     const newEntry = await Onboard.create({
 //       ...req.body,
-
 //       onboardedBy: {
 //         mobile: user.mobile,
-//         name: user.name,       // ✅ SAVE NAME
-//         userId: user._id,      // ✅ SAVE ID
+//         name: user.name,
+//         userId: user._id,
 //       },
-
 //       document: {
 //         url: req.file?.path || null,
 //         public_id: req.file?.filename || null,
@@ -36,15 +45,26 @@ import User from "../models/userModel.js";
 //     });
 
 //   } catch (error) {
-//     res.status(500).json({ message: error.message });
+//     res.status(500).json({ 
+//       success: false, 
+//       message: error.message 
+//     });
 //   }
 // };
 
 export const onboardGym = async (req, res) => {
   try {
-    const { ownerMobile, onboardedBy: salesMobile } = req.body;
+    const {
+      ownerMobile,
+      onboardedBy: salesMobile,
+      businessDocType,
+      businessDocNumber,
+      role,
+      segment,
+      ...rest
+    } = req.body;
 
-    // 1. 🔍 Check if this partner (Gym/Retailer) is already onboarded
+    // 1. 🔍 Check duplicate onboarding
     const existingOnboard = await Onboard.findOne({ ownerMobile });
     if (existingOnboard) {
       return res.status(400).json({
@@ -53,7 +73,7 @@ export const onboardGym = async (req, res) => {
       });
     }
 
-    // 2. 🔍 find sales user by mobile
+    // 2. 🔍 Validate sales user
     const user = await User.findOne({ mobile: salesMobile });
 
     if (!user) {
@@ -63,29 +83,53 @@ export const onboardGym = async (req, res) => {
       });
     }
 
-    // 3. Create new entry
+    // 3. ✅ Backend validation (IMPORTANT)
+    const segmentRequiredRoles = ["Retail Partner", "Wholesaler"];
+
+    if (segmentRequiredRoles.includes(role) && !segment) {
+      return res.status(400).json({
+        success: false,
+        message: "Segment is required for selected role",
+      });
+    }
+
+    // 4. 📝 Create entry
     const newEntry = await Onboard.create({
-      ...req.body,
+      ...rest,
+
+      role,
+      segment: segment || "",
+
+      ownerMobile,
+
+      // ✅ FIXED mapping
+      docType: businessDocType || "NA",
+      docNumber: businessDocNumber || "",
+
       onboardedBy: {
         mobile: user.mobile,
         name: user.name,
         userId: user._id,
       },
+
       document: {
         url: req.file?.path || null,
         public_id: req.file?.filename || null,
       },
     });
 
+    // 5. ✅ Response
     res.status(201).json({
       success: true,
       data: newEntry,
     });
 
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: error.message 
+    console.error("Onboard Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
     });
   }
 };
@@ -104,22 +148,7 @@ export const getOnboards = async (req, res) => {
   }
 };
 
-// export const updateOnboard = async (req, res) => {
-//   try {
-//     const updated = await Onboard.findByIdAndUpdate(
-//       req.params.id,
-//       { $set: req.body },
-//       { new: true, runValidators: true }
-//     );
-//     if (!updated) return res.status(404).json({ message: "Not found" });
-//     res.status(200).json({ success: true, data: updated });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
-
-// controllers/onboardController.js
 export const updateOnboard = async (req, res) => {
   try {
     let updateData = { ...req.body };

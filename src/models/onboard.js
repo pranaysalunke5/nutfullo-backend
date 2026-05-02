@@ -16,6 +16,7 @@ const onboardSchema = new mongoose.Schema(
         "Modern Trade",
         "Hotels",
         "Sweet Mart",
+        "Medical Store", // ✅ ADD THIS
         "",
       ],
       default: "",
