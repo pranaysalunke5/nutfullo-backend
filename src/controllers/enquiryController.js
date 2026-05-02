@@ -106,10 +106,6 @@ export const createEnquiry = async (req, res) => {
 };
 
 
-
-
-
-
 // @desc Get all enquiries for Admin
 export const getAllEnquiries = async (req, res) => {
   try {
@@ -143,5 +139,31 @@ export const updateEnquiryStatus = async (req, res) => {
     res.status(200).json({ success: true, data: enquiry });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const deleteEnquiry = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const enquiry = await Enquiry.findByIdAndDelete(id);
+
+    if (!enquiry) {
+      return res.status(404).json({
+        success: false,
+        message: "Enquiry not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Enquiry deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
