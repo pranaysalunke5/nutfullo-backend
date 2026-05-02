@@ -5,8 +5,7 @@ import { createEnquiry, getAllEnquiries, updateEnquiryStatus } from '../controll
 router.post('/create', createEnquiry);
 
 // routes/enquiryRoutes.js
-router.get('/all', getAllEnquiries); // Add middleware for admin check here
+router.get('/all', getAllEnquiries); 
 router.patch('/status/:id', updateEnquiryStatus);
-
 
 export default router;

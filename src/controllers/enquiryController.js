@@ -106,24 +106,40 @@ export const createEnquiry = async (req, res) => {
 };
 
 
-// controllers/enquiryController.js
 
-// @desc Get all enquiries
+
+
+
+// @desc Get all enquiries for Admin
 export const getAllEnquiries = async (req, res) => {
   try {
     const enquiries = await Enquiry.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: enquiries });
+    res.status(200).json({
+      success: true,
+      count: enquiries.length,
+      data: enquiries
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// @desc Update status
+// @desc Update Enquiry Status (Pending -> Resolved)
 export const updateEnquiryStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const enquiry = await Enquiry.findByIdAndUpdate(id, { status }, { new: true });
+
+    const enquiry = await Enquiry.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true }
+    );
+
+    if (!enquiry) {
+      return res.status(404).json({ success: false, message: "Enquiry not found" });
+    }
+
     res.status(200).json({ success: true, data: enquiry });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
